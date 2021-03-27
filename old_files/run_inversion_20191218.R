@@ -5,12 +5,12 @@ rm(list = ls())
 
 # Load in packages
 library(tidyverse)
-library(BART)
+library(bartMachine)
 library(readxl)
 library(directlabels)
 
 # Source in the model code
-source("full_bayes_inversion_20210326.R")
+source("full_bayes_inversion_20191218.R")
 
 # Basic plot --------------------------------------------------------------
 
@@ -70,8 +70,9 @@ ggplot(p2, aes(x = age, y = p_HNC * 10000, colour = sex)) +
     title = "Probability of HNSCC given HPV for married insured whites",
     subtitle = "(with 95% uncertainty interval)"
   )
-ggsave(file = "p_HNC_by_sex_20210326.pdf", width = 10, height = 5)
-write.csv(p2, file = "p_HNC_by_sex_20210326.csv", quote = FALSE, row.names = FALSE)
+stop()
+ggsave(file = "p_HNC_by_sex_20191218.pdf", width = 10, height = 5)
+write.csv(p2, file = "p_HNC_by_sex_20191218.csv", quote = FALSE, row.names = FALSE)
 
 # Marital status ----------------------------------------------------------
 
@@ -122,8 +123,8 @@ ggplot(p3, aes(
     title = "Probability of HNSCC given HPV for insured whites by marital status",
     subtitle = "(with 95% uncertainty interval)"
   )
-ggsave(file = "p_HNC_by_marital_status_20210326.pdf", width = 10, height = 5)
-write.csv(p3, file = "p_HNC_by_marital_status_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(file = "p_HNC_by_marital_status_20191218.pdf", width = 10, height = 5)
+write.csv(p3, file = "p_HNC_by_marital_status_20191218.csv", quote = FALSE, row.names = FALSE)
 
 # Race --------------------------------------------------------------------
 
@@ -173,8 +174,8 @@ ggplot(p4, aes(x = age, y = p_HNC * 10000, colour = ethnicity)) +
     title = "Probability of HNSCC given HPV for married insured people by ethnicity",
     subtitle = "(with 95% uncertainty interval)"
   )
-ggsave(file = "p_HNC_by_ethnicity_20210326.pdf", width = 10, height = 5)
-write.csv(p4, file = "p_HNC_by_ethnicity_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(file = "p_HNC_by_ethnicity_20191218.pdf", width = 10, height = 5)
+write.csv(p4, file = "p_HNC_by_ethnicity_20191218.csv", quote = FALSE, row.names = FALSE)
 
 # Smoking -----------------------------------------------------------------
 
@@ -220,8 +221,8 @@ ggplot(p5, aes(x = age, y = p_HNC * 10000, colour = smoker_pertenthousand)) +
     title = "Probability of HNSCC given HPV for married insured whites by regional smoking percentage",
     subtitle = "(with 95% uncertainty interval)"
   )
-ggsave(file = "p_HNC_by_smoking_20210326.pdf", width = 10, height = 5)
-write.csv(p5, file = "p_HNC_by_smoking_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(file = "p_HNC_by_smoking_20191218.pdf", width = 10, height = 5)
+write.csv(p5, file = "p_HNC_by_smoking_20191218.csv", quote = FALSE, row.names = FALSE)
 
 # Insurance types ---------------------------------------------------------
 
@@ -267,5 +268,5 @@ ggplot(p6, aes(x = age, y = p_HNC * 10000, colour = insurance)) +
     title = "Probability of HNC given HPV for married insured whites by medical insurance",
     subtitle = "(with 95% uncertainty interval)"
   )
-ggsave(file = "p_HNC_by_insurance_20210326.pdf", width = 10, height = 5)
-write.csv(p6, file = "p_HNC_by_insurance_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(file = "p_HNC_by_insurance_20191218.pdf", width = 10, height = 5)
+write.csv(p6, file = "p_HNC_by_insurance_20191218.csv", quote = FALSE, row.names = FALSE)

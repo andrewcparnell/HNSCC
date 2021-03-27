@@ -73,43 +73,44 @@
 # predict_fun_ci ----------------------------------------------------------
 # ------------------------------------------------------------------------
 
-predict_fun_ci = function(age = 60,
-                          smoker_pertenthousand = 1800,
-                       sex = c('Male', 'Female'),
-                       ethnicity = c(
-                         "American Indian/Alaska Native",
-                         "Asian Indian or Pakistani",
-                         "Black",
-                         "Chinese",
-                         "Filipino",
-                         "Japanese",
-                         "Korean",
-                         "Other Asian",
-                         "Other_Non-Spanish-Hispanic-Latino",
-                         "Other_Spanish-Hispanic-Latino",
-                         "Pacific Islander",
-                         "South East Asian",
-                         "Unknown_Non-Spanish-Hispanic-Latino",
-                         "Unknown_Spanish-Hispanic-Latino",
-                         "White_Non-Spanish-Hispanic-Latino",
-                         "White_Spanish-Hispanic-Latino"
-                       ),
-                       marital_status_at_diagnosis = c(
-                         "Married (including common law)",
-                         "Single (never married)",
-                         "Divorced",
-                         "Widowed",
-                         "Unknown",
-                         "Unmarried or Domestic Partner",
-                         "Separated"
-                       ),
-                       insurance = c("Insured",
-                                     "Medicaid",
-                                     "Medicare enabled",
-                                     "Uninsured",
-                                     "Unknown"
-                       ),
-                       levels = c(0.025, 0.5, 0.975)) {
+predict_fun_ci <- function(age = 60,
+                           smoker_pertenthousand = 1800,
+                           sex = c("Male", "Female"),
+                           ethnicity = c(
+                             "American Indian/Alaska Native",
+                             "Asian Indian or Pakistani",
+                             "Black",
+                             "Chinese",
+                             "Filipino",
+                             "Japanese",
+                             "Korean",
+                             "Other Asian",
+                             "Other_Non-Spanish-Hispanic-Latino",
+                             "Other_Spanish-Hispanic-Latino",
+                             "Pacific Islander",
+                             "South East Asian",
+                             "Unknown_Non-Spanish-Hispanic-Latino",
+                             "Unknown_Spanish-Hispanic-Latino",
+                             "White_Non-Spanish-Hispanic-Latino",
+                             "White_Spanish-Hispanic-Latino"
+                           ),
+                           marital_status_at_diagnosis = c(
+                             "Married (including common law)",
+                             "Single (never married)",
+                             "Divorced",
+                             "Widowed",
+                             "Unknown",
+                             "Unmarried or Domestic Partner",
+                             "Separated"
+                           ),
+                           insurance = c(
+                             "Insured",
+                             "Medicaid",
+                             "Medicare enabled",
+                             "Uninsured",
+                             "Unknown"
+                           ),
+                           levels = c(0.025, 0.5, 0.975)) {
   # Probably should do some error checking here, especially to see if the coded answers above match
 
   # Need to calculate
@@ -117,27 +118,31 @@ predict_fun_ci = function(age = 60,
   # These are shortened to: p_answer = p_model * p_histology / p_HPV_incidence
 
   # Tidy up arguments
-  sex = match.arg(sex, several.ok = TRUE)
-  ethnicity = match.arg(ethnicity, several.ok = TRUE)
-  marital_status_at_diagnosis = match.arg(marital_status_at_diagnosis,
-                                          several.ok = TRUE)
-  insurance = match.arg(insurance,
-                        several.ok = TRUE)
-  n_pred = length(age)
-  #browser()
+  sex <- match.arg(sex, several.ok = TRUE)
+  ethnicity <- match.arg(ethnicity, several.ok = TRUE)
+  marital_status_at_diagnosis <- match.arg(marital_status_at_diagnosis,
+    several.ok = TRUE
+  )
+  insurance <- match.arg(insurance,
+    several.ok = TRUE
+  )
+  n_pred <- length(age)
+  # browser()
 
   # p_model -----------------------------------------------------------------
 
   # Read in the model
-  mod = readRDS('bart_model_reduced_20210326.rds')
+  mod <- readRDS("bart_model_reduced_20210326.rds")
 
   # This has 3 variables:
   # AgeAtDiagnosis, MaritalStatusAtDiagnostis, and Race
-  new_x = data.frame(
+  new_x <- data.frame(
     AgeAtDiagnosis = age,
     CurrentSmokerPercentage = smoker_pertenthousand,
-    Sex = factor(sex, levels = c(c("Female",
-                                   "Male"))),
+    Sex = factor(sex, levels = c(c(
+      "Female",
+      "Male"
+    ))),
     MaritalStatusAtDiagnosis = factor(
       marital_status_at_diagnosis,
       levels =
@@ -173,24 +178,27 @@ predict_fun_ci = function(age = 60,
       )
     ),
     Insurance = factor(insurance,
-                      levels = c("Insured",
-                                 "Medicaid",
-                                 "Medicare enabled",
-                                 "Uninsured",
-                                 "Unknown"))
+      levels = c(
+        "Insured",
+        "Medicaid",
+        "Medicare enabled",
+        "Uninsured",
+        "Unknown"
+      )
+    )
   ) %>%
-    bartModelMatrix
+    bartModelMatrix()
 
-  full_post = predict(mod, newdata = new_x)$prob.test
-  p_model_all = 1 - apply(full_post, 2, quantile, probs = rev(levels))
+  full_post <- predict(mod, newdata = new_x)$prob.test
+  p_model_all <- 1 - apply(full_post, 2, quantile, probs = rev(levels))
 
   # p_HNC_incidence --------------------------------------------------------
 
   # Load in the incidence probabilities
-  HNC_inc_raw = readRDS('seer_incidence_rates_wide_20191812.rds')
+  HNC_inc_raw <- readRDS("seer_incidence_rates_wide_20191812.rds")
 
   # Recode the ethnicity and age variables correctly
-  eth_new = case_when(
+  eth_new <- case_when(
     ethnicity == "American Indian/Alaska Native" ~ "American_Indian",
     ethnicity == "Asian Indian or Pakistani" ~ "Asian",
     ethnicity == "Black" ~ "Black",
@@ -207,39 +215,45 @@ predict_fun_ci = function(age = 60,
     ethnicity == "White_Non-Spanish-Hispanic-Latino" ~ "White",
     ethnicity == "White_Spanish-Hispanic-Latino" ~ "White_Hispanic"
   )
-  age_new = case_when(
-    between(age, 15, 34) ~ '15-34',
-    between(age, 35, 44) ~ '35-44',
-    between(age, 45, 54) ~ '45-54',
-    between(age, 55, 64) ~ '55-64',
-    between(age, 65, 74) ~ '65-74',
-    age >= 75 ~ '75+'
+  age_new <- case_when(
+    between(age, 15, 34) ~ "15-34",
+    between(age, 35, 44) ~ "35-44",
+    between(age, 45, 54) ~ "45-54",
+    between(age, 55, 64) ~ "55-64",
+    between(age, 65, 74) ~ "65-74",
+    age >= 75 ~ "75+"
   )
-  sex_new = case_when(
+  sex_new <- case_when(
     sex == "Male" ~ "M",
     sex == "Female" ~ "F"
   )
 
   # Now gather up and recode ethnicity
-  HNC_inc = HNC_inc_raw %>% gather(Age,
-                                   Probability,-Ethnicity,-Sex)
+  HNC_inc <- HNC_inc_raw %>% gather(
+    Age,
+    Probability, -Ethnicity, -Sex
+  )
 
   # Calculate p_HNC_incidence
-  p_HNC_incidence = rep(NA, n_pred)
+  p_HNC_incidence <- rep(NA, n_pred)
   for (i in 1:n_pred) {
-    p_HNC_incidence[i] = HNC_inc %>% filter(Ethnicity == eth_new[i],
-                                            Sex == sex_new[i],
-                                            Age == age_new[i]) %>%
-      select(Probability) %>% pull
+    p_HNC_incidence[i] <- HNC_inc %>%
+      filter(
+        Ethnicity == eth_new[i],
+        Sex == sex_new[i],
+        Age == age_new[i]
+      ) %>%
+      select(Probability) %>%
+      pull()
   }
 
   # p_HPV_incidence ---------------------------------------------------------
 
   # Load in data
-  HPV_inc = read_csv('Incidence_rates_HPV.csv', col_types = cols())
+  HPV_inc <- read_csv("Incidence_rates_HPV.csv", col_types = cols())
 
   # Recode ethnicity again
-  eth_new2 = case_when(
+  eth_new2 <- case_when(
     ethnicity == "American Indian/Alaska Native" ~ "Other",
     ethnicity == "Asian Indian or Pakistani" ~ "Asian",
     ethnicity == "Black" ~ "Black",
@@ -259,40 +273,53 @@ predict_fun_ci = function(age = 60,
   )
 
   # HPV incidence
-  p_HPV_incidence = rep(NA, n_pred)
+  p_HPV_incidence <- rep(NA, n_pred)
   for (i in 1:n_pred) {
-    p_HPV_incidence[i] = HPV_inc %>% filter(Ethnicity == eth_new2[i],
-                                            Sex == sex[i],
-                                            Age == age_new[i]) %>%
-      select(freq) %>% pull
+    p_HPV_incidence[i] <- HPV_inc %>%
+      filter(
+        Ethnicity == eth_new2[i],
+        Sex == sex[i],
+        Age == age_new[i]
+      ) %>%
+      select(freq) %>%
+      pull()
   }
 
   # Final calculation -------------------------------------------------------
 
-  p_HNC_incidence_all = matrix(rep(p_HNC_incidence, 3), nrow = 3,
-                               byrow = TRUE)
-  p_HPV_incidence_all = matrix(rep(p_HPV_incidence, 3), nrow = 3,
-                               byrow = TRUE)
-  p_answer = p_model_all * p_HNC_incidence_all / p_HPV_incidence_all
+  p_HNC_incidence_all <- matrix(rep(p_HNC_incidence, 3),
+    nrow = 3,
+    byrow = TRUE
+  )
+  p_HPV_incidence_all <- matrix(rep(p_HPV_incidence, 3),
+    nrow = 3,
+    byrow = TRUE
+  )
+  p_answer <- p_model_all * p_HNC_incidence_all / p_HPV_incidence_all
+  p_opp_answer <- (1 - p_model_all) * p_HNC_incidence_all / (1 - p_HPV_incidence_all)
 
-  out = data.frame(age,
-                   smoker_pertenthousand,
-                   sex,
-                   ethnicity,
-                   marital_status_at_diagnosis,
-                   insurance,
-                   p_model_low = p_model_all[1,],
-                   p_model = p_model_all[2,],
-                   p_model_high = p_model_all[3,],
-                   p_HNC_incidence_low = p_HNC_incidence_all[1,],
-                   p_HNC_incidence = p_HNC_incidence_all[2,],
-                   p_HNC_incidence_high = p_HNC_incidence_all[3,],
-                   p_HPV_incidence_low = p_HPV_incidence_all[1,],
-                   p_HPV_incidence = p_HPV_incidence_all[2,],
-                   p_HPV_incidence_high = p_HPV_incidence_all[3,],
-                   p_HNC_low = p_answer[1,],
-                   p_HNC = p_answer[2,],
-                   p_HNC_high = p_answer[3,])
+  out <- data.frame(age,
+    smoker_pertenthousand,
+    sex,
+    ethnicity,
+    marital_status_at_diagnosis,
+    insurance,
+    p_model_low = p_model_all[1, ],
+    p_model = p_model_all[2, ],
+    p_model_high = p_model_all[3, ],
+    p_HNC_incidence_low = p_HNC_incidence_all[1, ],
+    p_HNC_incidence = p_HNC_incidence_all[2, ],
+    p_HNC_incidence_high = p_HNC_incidence_all[3, ],
+    p_HPV_incidence_low = p_HPV_incidence_all[1, ],
+    p_HPV_incidence = p_HPV_incidence_all[2, ],
+    p_HPV_incidence_high = p_HPV_incidence_all[3, ],
+    p_HNC_no_HPV_low = p_opp_answer[1, ],
+    p_HNC_no_HPV = p_opp_answer[2, ],
+    p_HNC_no_HPV_high = p_opp_answer[3, ],
+    p_HNC_low = p_answer[1, ],
+    p_HNC = p_answer[2, ],
+    p_HNC_high = p_answer[3, ]
+  )
 
   return(out)
 }
