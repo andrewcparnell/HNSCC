@@ -11,7 +11,7 @@ library(randomForest)
 library(ROCR)
 
 # Load in data - terrible name for csv file
-d <- read.csv("model_datav4.csv",
+d <- read.csv("../OPSCC_private/model_datav4.csv",
   stringsAsFactors = TRUE
 )
 
@@ -75,8 +75,8 @@ model2 <- BART::pbart(
   x.train = train2[, -1],
   y.train = train2[, 1]
 )
-saveRDS(model2, file = "bart_model_reduced_20210326.rds")
-model2 <- readRDS(file = "bart_model_reduced_20210326.rds")
+saveRDS(model2, file = "../OPSCC_private/bart_model_reduced_20210326.rds")
+model2 <- readRDS(file = "../OPSCC_private/bart_model_reduced_20210326.rds")
 
 # Get full posterior
 testing2 <- apply(predict(model2, newdata = test2[, -1])$prob.test, 2, "mean")

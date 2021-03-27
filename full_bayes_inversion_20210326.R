@@ -132,7 +132,7 @@ predict_fun_ci <- function(age = 60,
   # p_model -----------------------------------------------------------------
 
   # Read in the model
-  mod <- readRDS("bart_model_reduced_20210326.rds")
+  mod <- readRDS("../OPSCC_private/bart_model_reduced_20210326.rds")
 
   # This has 3 variables:
   # AgeAtDiagnosis, MaritalStatusAtDiagnostis, and Race
@@ -195,7 +195,7 @@ predict_fun_ci <- function(age = 60,
   # p_HNC_incidence --------------------------------------------------------
 
   # Load in the incidence probabilities
-  HNC_inc_raw <- readRDS("seer_incidence_rates_wide_20191812.rds")
+  HNC_inc_raw <- readRDS("../OPSCC_private/seer_incidence_rates_wide_20191812.rds")
 
   # Recode the ethnicity and age variables correctly
   eth_new <- case_when(
@@ -250,7 +250,7 @@ predict_fun_ci <- function(age = 60,
   # p_HPV_incidence ---------------------------------------------------------
 
   # Load in data
-  HPV_inc <- read_csv("Incidence_rates_HPV.csv", col_types = cols())
+  HPV_inc <- read_csv("../OPSCC_private/Incidence_rates_HPV.csv", col_types = cols())
 
   # Recode ethnicity again
   eth_new2 <- case_when(
