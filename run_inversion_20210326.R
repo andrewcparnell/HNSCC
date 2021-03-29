@@ -77,7 +77,7 @@ plot2a <- ggplot(p2, aes(x = age, y = p_HNC * 10000, colour = sex)) +
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of HNSCC given HPV for married insured whites",
+    title = "Probability of OPSCC given HPV for married insured whites",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = sex)) +
@@ -95,7 +95,7 @@ plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = sex)) +
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of HNSCC given no HPV for married insured whites",
+    title = "Probability of OPSCC given no HPV for married insured whites",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot2 <- grid.arrange(plot2a, plot2b,
@@ -156,7 +156,7 @@ plot3a <- ggplot(p3, aes(
   ) +
   facet_grid(sex ~ ., scales = "free") +
   labs(
-    title = "Probability of HNSCC given HPV for insured whites by marital status",
+    title = "Probability of OPSCC given HPV for insured whites by marital status",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot3b <- ggplot(p3, aes(
@@ -185,7 +185,7 @@ plot3b <- ggplot(p3, aes(
   ) +
   facet_grid(sex ~ ., scales = "free") +
   labs(
-    title = "Probability of HNSCC given no HPV for insured whites by marital status",
+    title = "Probability of OPSCC given no HPV for insured whites by marital status",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot3 <- grid.arrange(plot3a, plot3b,
@@ -245,7 +245,7 @@ plot4a <- ggplot(p4, aes(x = age, y = p_HNC * 10000, colour = ethnicity)) +
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of HNSCC given HPV for married insured people by ethnicity",
+    title = "Probability of OPSCC given HPV for married insured people by ethnicity",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = ethnicity)) +
@@ -269,7 +269,7 @@ plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = ethnicity))
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of HNSCC given no HPV for married insured people by ethnicity",
+    title = "Probability of OPSCC given no HPV for married insured people by ethnicity",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot4 <- grid.arrange(plot4a, plot4b,
@@ -325,7 +325,7 @@ plot5a <- ggplot(p5, aes(x = age, y = p_HNC * 10000, colour = smoker_pertenthous
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of HNSCC given HPV for married insured whites by regional smoking percentage",
+    title = "Probability of OPSCC given HPV for married insured whites by regional smoking percentage",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot5b <- ggplot(p5, aes(x = age, y = p_HNC_no_HPV * 10000, colour = smoker_pertenthousand)) +
@@ -349,7 +349,7 @@ plot5b <- ggplot(p5, aes(x = age, y = p_HNC_no_HPV * 10000, colour = smoker_pert
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of HNSCC given no HPV for married insured whites by regional smoking percentage",
+    title = "Probability of OPSCC given no HPV for married insured whites by regional smoking percentage",
     subtitle = "(with 95% uncertainty interval)"
   )
 plot5 <- grid.arrange(plot5a, plot5b,
