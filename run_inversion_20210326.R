@@ -9,6 +9,9 @@ library(BART)
 library(readxl)
 library(gridExtra)
 library(directlabels)
+library(ggpubr)
+library(grid)
+library(grDevices)
 
 # Source in the model code
 source("full_bayes_inversion_20210326.R")
@@ -57,20 +60,21 @@ p2 <- predict_fun_ci(
   marital_status_at_diagnosis =
     rep("Married (including common law)", n_pred2),
   insurance = rep("Insured", n_pred2)
-)
+) %>% rename(Sex = sex)
 
 # Have a look at the difference between the different parts
 # p2a = p2 %>% select(age, sex, p_model, p_HNC_incidence, p_HPV_incidence, p_HNC)
 
-plot2a <- ggplot(p2, aes(x = age, y = p_HNC * 10000, colour = sex)) +
-  geom_dl(aes(label = sex),
-    method = "last.points"
+plot2a <- ggplot(p2, aes(x = age, y = p_HNC * 10000, colour = Sex, linetype = Sex)) +
+  # geom_dl(aes(label = sex),
+  #   method = "last.points"
+  # ) +
+  # scale_x_continuous(limits = c(25, 75)) +
+  geom_ribbon(aes(ymin = p_HNC_low * 10000, ymax = p_HNC_high * 10000, fill = Sex),
+    alpha = 0.4, colour = NA#, show.legend = FALSE
   ) +
-  scale_x_continuous(limits = c(25, 75)) +
-  geom_ribbon(aes(ymin = p_HNC_low * 10000, ymax = p_HNC_high * 10000, fill = sex),
-    alpha = 0.4, colour = NA, show.legend = FALSE
-  ) +
-  geom_line(show.legend = FALSE) +
+  #geom_line(show.legend = FALSE) +
+  geom_line() +
   theme_bw() +
   theme(
     axis.title.x = element_blank(),
@@ -78,17 +82,17 @@ plot2a <- ggplot(p2, aes(x = age, y = p_HNC * 10000, colour = sex)) +
   ) +
   labs(
     title = "Probability of OPSCC given HPV for married insured whites",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
-plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = sex)) +
-  geom_dl(aes(label = sex),
-    method = "last.points"
+plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Sex, linetype = Sex)) +
+  # geom_dl(aes(label = Sex),
+  #   method = "last.points"
+  # ) +
+  # scale_x_continuous(limits = c(25, 75)) +
+  geom_ribbon(aes(ymin = p_HNC_no_HPV_low * 10000, ymax = p_HNC_no_HPV_high * 10000, fill = Sex),
+    alpha = 0.4, colour = NA#, show.legend = FALSE
   ) +
-  scale_x_continuous(limits = c(25, 75)) +
-  geom_ribbon(aes(ymin = p_HNC_no_HPV_low * 10000, ymax = p_HNC_no_HPV_high * 10000, fill = sex),
-    alpha = 0.4, colour = NA, show.legend = FALSE
-  ) +
-  geom_line(show.legend = FALSE) +
+  geom_line() + #show.legend = FALSE) +
   theme_bw() +
   theme(
     axis.title.x = element_blank(),
@@ -96,16 +100,24 @@ plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = sex)) +
   ) +
   labs(
     title = "Probability of OPSCC given no HPV for married insured whites",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
-plot2 <- grid.arrange(plot2a, plot2b,
-  ncol = 1,
-  bottom = "Age",
-  left = "Cases per ten thousand"
-)
-ggsave(plot2, file = "output/p_HNC_by_sex_20210326.pdf", width = 10, height = 5)
-ggsave(plot2, file = "output/p_HNC_by_sex_20210326.png", width = 10, height = 5)
-write.csv(p2, file = "output/p_HNC_by_sex_20210326.csv", quote = FALSE, row.names = FALSE)
+
+plot2 <-  ggarrange(plot2a, plot2b, ncol=1, nrow=2, common.legend = TRUE, legend = 'right')
+plot2 <- annotate_figure(plot2, left = textGrob("Cases per ten thousand", rot = 90, vjust = 1),
+                bottom = textGrob("Age"))
+#mylegend<-g_legend(plot2a)
+# plot2 <- grid.arrange(plot2a, plot2b,
+#   ncol = 1,
+#   bottom = "Age",
+#   left = "Cases per ten thousand"
+# )
+ggsave(plot2, file = "output/p_HNC_by_sex_20210705.pdf", width = 10, height = 5)
+ggsave(plot2, file = "output/p_HNC_by_sex_20210705.png", width = 10, height = 5)
+#ggsave(plot2, file = "output/p_HNC_by_sex_20210705.tiff", width = 10, height = 5) #, compression = "lzw", type = "Xlib")
+#ggsave(plot2, file = "output/p_HNC_by_sex_20210705.eps", width = 10, height = 5, device = cairo_ps)
+write.csv(p2, file = "output/p_HNC_by_sex_20210705.csv", quote = FALSE, row.names = FALSE)
+system("pdf2ps output/p_HNC_by_sex_20210705.pdf output/p_HNC_by_sex_20210705.eps")
 
 # Marital status ----------------------------------------------------------
 
@@ -134,6 +146,7 @@ plot3a <- ggplot(p3, aes(
   x = age, y = p_HNC * 10000,
   colour = marital_status_at_diagnosis
 )) +
+  geom_line() +
   geom_line(show.legend = FALSE) +
   geom_dl(aes(label = marital_status_at_diagnosis),
     method = "last.points"
@@ -157,7 +170,7 @@ plot3a <- ggplot(p3, aes(
   facet_grid(sex ~ ., scales = "free") +
   labs(
     title = "Probability of OPSCC given HPV for insured whites by marital status",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
 plot3b <- ggplot(p3, aes(
   x = age, y = p_HNC_no_HPV * 10000,
@@ -186,15 +199,15 @@ plot3b <- ggplot(p3, aes(
   facet_grid(sex ~ ., scales = "free") +
   labs(
     title = "Probability of OPSCC given no HPV for insured whites by marital status",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
 plot3 <- grid.arrange(plot3a, plot3b,
   ncol = 1,
   bottom = "Age",
   left = "Cases per ten thousand"
 )
-ggsave(plot3, file = "output/p_HNC_by_marital_status_20210326.pdf", width = 10, height = 5)
-write.csv(p3, file = "output/p_HNC_by_marital_status_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(plot3, file = "output/p_HNC_by_marital_status_20210705.pdf", width = 10, height = 5)
+write.csv(p3, file = "output/p_HNC_by_marital_status_20210705.csv", quote = FALSE, row.names = FALSE)
 
 # Race --------------------------------------------------------------------
 
@@ -218,26 +231,26 @@ p4 <- predict_fun_ci(
   marital_status_at_diagnosis = "Married (including common law)",
   insurance = rep("Insured", n_pred4)
 )
-p4$ethnicity <- factor(p4$ethnicity)
-levels(p4$ethnicity) <- c("Black", "White", "Hispanic")
+p4$Ethnicity <- factor(p4$ethnicity)
+levels(p4$Ethnicity) <- c("Black", "White", "Hispanic")
 
 # Look at values
-p4a <- p4 %>% select(age, sex, ethnicity, p_model, p_HNC_incidence, p_HPV_incidence, p_HNC)
-
-plot4a <- ggplot(p4, aes(x = age, y = p_HNC * 10000, colour = ethnicity)) +
-  geom_line(show.legend = FALSE) +
-  geom_dl(aes(label = ethnicity),
-    method = "last.points"
+p4a <- p4 %>% select(age, sex, Ethnicity, p_model, p_HNC_incidence, p_HPV_incidence, p_HNC)
+plot4a <- ggplot(p4, aes(x = age, y = p_HNC * 10000, colour = Ethnicity, linetype = Ethnicity)) +
+  geom_line() +
+  # geom_line(show.legend = FALSE) +
+  # geom_dl(aes(label = ethnicity),
+  #   method = "last.points"
+  # ) +
+  # scale_x_continuous(limits = c(25, 75)) +
+  # guides(
+  #   colour = guide_legend(title = "Sex"),
+  #   linetype = guide_legend(title = "Ethnicity")
+  # ) +
+  geom_ribbon(aes(ymin = p_HNC_low * 10000, ymax = p_HNC_high * 10000, fill = Ethnicity),
+    alpha = 0.4, colour = NA #, show.legend = FALSE
   ) +
-  scale_x_continuous(limits = c(25, 75)) +
-  guides(
-    colour = guide_legend(title = "Sex"),
-    linetype = guide_legend(title = "Ethnicity")
-  ) +
-  geom_ribbon(aes(ymin = p_HNC_low * 10000, ymax = p_HNC_high * 10000, fill = ethnicity),
-    alpha = 0.4, colour = NA, show.legend = FALSE
-  ) +
-  guides(colour = guide_legend(title = "Ethnicity")) +
+  #guides(colour = guide_legend(title = "Ethnicity")) +
   facet_grid(sex ~ ., scales = "free") +
   theme_bw() +
   theme(
@@ -246,22 +259,23 @@ plot4a <- ggplot(p4, aes(x = age, y = p_HNC * 10000, colour = ethnicity)) +
   ) +
   labs(
     title = "Probability of OPSCC given HPV for married insured people by ethnicity",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
-plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = ethnicity)) +
-  geom_line(show.legend = FALSE) +
-  geom_dl(aes(label = ethnicity),
-    method = "last.points"
+plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Ethnicity, linetype = Ethnicity)) +
+  geom_line() +
+  # geom_line(show.legend = FALSE) +
+  # geom_dl(aes(label = ethnicity),
+  #   method = "last.points"
+  # ) +
+  # scale_x_continuous(limits = c(25, 75)) +
+  # guides(
+  #   colour = guide_legend(title = "Sex"),
+  #   linetype = guide_legend(title = "Ethnicity")
+  # ) +
+  geom_ribbon(aes(ymin = p_HNC_no_HPV_low * 10000, ymax = p_HNC_no_HPV_high * 10000, fill = Ethnicity),
+    alpha = 0.4, colour = NA
   ) +
-  scale_x_continuous(limits = c(25, 75)) +
-  guides(
-    colour = guide_legend(title = "Sex"),
-    linetype = guide_legend(title = "Ethnicity")
-  ) +
-  geom_ribbon(aes(ymin = p_HNC_no_HPV_low * 10000, ymax = p_HNC_no_HPV_high * 10000, fill = ethnicity),
-    alpha = 0.4, colour = NA, show.legend = FALSE
-  ) +
-  guides(colour = guide_legend(title = "Ethnicity")) +
+  # guides(colour = guide_legend(title = "Ethnicity")) +
   facet_grid(sex ~ ., scales = "free") +
   theme_bw() +
   theme(
@@ -270,16 +284,20 @@ plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = ethnicity))
   ) +
   labs(
     title = "Probability of OPSCC given no HPV for married insured people by ethnicity",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
-plot4 <- grid.arrange(plot4a, plot4b,
-  ncol = 1,
-  bottom = "Age",
-  left = "Cases per ten thousand"
-)
-ggsave(plot4, file = "output/p_HNC_by_ethnicity_20210326.pdf", width = 10, height = 5)
-ggsave(plot4, file = "output/p_HNC_by_ethnicity_20210326.png", width = 10, height = 5)
-write.csv(p4, file = "output/p_HNC_by_ethnicity_20210326.csv", quote = FALSE, row.names = FALSE)
+# plot4 <- grid.arrange(plot4a, plot4b,
+#   ncol = 1,
+#   bottom = "Age",
+#   left = "Cases per ten thousand"
+# )
+plot4 <-  ggarrange(plot4a, plot4b, ncol=1, nrow=2, common.legend = TRUE, legend = 'right')
+plot4 <- annotate_figure(plot4, left = textGrob("Cases per ten thousand", rot = 90, vjust = 1),
+                         bottom = textGrob("Age"))
+ggsave(plot4, file = "output/p_HNC_by_ethnicity_20210705.pdf", width = 10, height = 5)
+ggsave(plot4, file = "output/p_HNC_by_ethnicity_20210705.png", width = 10, height = 5)
+write.csv(p4, file = "output/p_HNC_by_ethnicity_20210705.csv", quote = FALSE, row.names = FALSE)
+system("pdf2ps output/p_HNC_by_ethnicity_20210705.pdf output/p_HNC_by_ethnicity_20210705.eps")
 
 # Smoking -----------------------------------------------------------------
 
@@ -326,7 +344,7 @@ plot5a <- ggplot(p5, aes(x = age, y = p_HNC * 10000, colour = smoker_pertenthous
   ) +
   labs(
     title = "Probability of OPSCC given HPV for married insured whites by regional smoking percentage",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
 plot5b <- ggplot(p5, aes(x = age, y = p_HNC_no_HPV * 10000, colour = smoker_pertenthousand)) +
   geom_line(show.legend = FALSE) +
@@ -350,15 +368,15 @@ plot5b <- ggplot(p5, aes(x = age, y = p_HNC_no_HPV * 10000, colour = smoker_pert
   ) +
   labs(
     title = "Probability of OPSCC given no HPV for married insured whites by regional smoking percentage",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
 plot5 <- grid.arrange(plot5a, plot5b,
   ncol = 1,
   bottom = "Age",
   left = "Cases per ten thousand"
 )
-ggsave(plot5, file = "output/p_HNC_by_smoking_20210326.pdf", width = 10, height = 5)
-write.csv(p5, file = "output/p_HNC_by_smoking_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(plot5, file = "output/p_HNC_by_smoking_20210705.pdf", width = 10, height = 5)
+write.csv(p5, file = "output/p_HNC_by_smoking_20210705.csv", quote = FALSE, row.names = FALSE)
 
 # Insurance types ---------------------------------------------------------
 
@@ -405,7 +423,7 @@ plot6a <- ggplot(p6, aes(x = age, y = p_HNC * 10000, colour = insurance)) +
   ) +
   labs(
     title = "Probability of HNC given HPV for married insured whites by medical insurance",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
 plot6b <- ggplot(p6, aes(x = age, y = p_HNC_no_HPV * 10000, colour = insurance)) +
   geom_line(show.legend = FALSE) +
@@ -429,12 +447,12 @@ plot6b <- ggplot(p6, aes(x = age, y = p_HNC_no_HPV * 10000, colour = insurance))
   ) +
   labs(
     title = "Probability of HNC given no HPV for married insured whites by medical insurance",
-    subtitle = "(with 95% uncertainty interval)"
+    subtitle = "(with 95% credible interval)"
   )
 plot6 <- grid.arrange(plot6a, plot6b,
   ncol = 1,
   bottom = "Age",
   left = "Cases per ten thousand"
 )
-ggsave(file = "output/p_HNC_by_insurance_20210326.pdf", width = 10, height = 5)
-write.csv(p6, file = "output/p_HNC_by_insurance_20210326.csv", quote = FALSE, row.names = FALSE)
+ggsave(file = "output/p_HNC_by_insurance_20210705.pdf", width = 10, height = 5)
+write.csv(p6, file = "output/p_HNC_by_insurance_20210705.csv", quote = FALSE, row.names = FALSE)
