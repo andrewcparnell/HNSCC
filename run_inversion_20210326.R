@@ -81,7 +81,7 @@ plot2a <- ggplot(p2, aes(x = age, y = p_HNC * 10000, colour = Sex, linetype = Se
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of OPSCC given HPV for married insured whites",
+    title = "2A: Probability of OPSCC given HPV for married insured whites",
     subtitle = "(with 95% credible interval)"
   )
 plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Sex, linetype = Sex)) +
@@ -99,11 +99,11 @@ plot2b <- ggplot(p2, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Sex, linety
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of OPSCC given no HPV for married insured whites",
+    title = "2B: Probability of OPSCC given no HPV for married insured whites",
     subtitle = "(with 95% credible interval)"
   )
 
-plot2 <-  ggarrange(plot2a, plot2b, ncol=1, nrow=2, common.legend = TRUE, legend = 'right')
+plot2 <-  ggarrange(plot2a, plot2b, ncol=1, nrow=2, common.legend = TRUE, legend = 'bottom')
 plot2 <- annotate_figure(plot2, left = textGrob("Cases per ten thousand", rot = 90, vjust = 1),
                 bottom = textGrob("Age"))
 #mylegend<-g_legend(plot2a)
@@ -112,6 +112,7 @@ plot2 <- annotate_figure(plot2, left = textGrob("Cases per ten thousand", rot = 
 #   bottom = "Age",
 #   left = "Cases per ten thousand"
 # )
+
 ggsave(plot2, file = "output/p_HNC_by_sex_20210705.pdf", width = 10, height = 5)
 ggsave(plot2, file = "output/p_HNC_by_sex_20210705.png", width = 10, height = 5)
 #ggsave(plot2, file = "output/p_HNC_by_sex_20210705.tiff", width = 10, height = 5) #, compression = "lzw", type = "Xlib")
@@ -258,7 +259,7 @@ plot4a <- ggplot(p4, aes(x = age, y = p_HNC * 10000, colour = Ethnicity, linetyp
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of OPSCC given HPV for married insured people by ethnicity",
+    title = "1A: Probability of OPSCC given HPV for married insured people by ethnicity",
     subtitle = "(with 95% credible interval)"
   )
 plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Ethnicity, linetype = Ethnicity)) +
@@ -283,7 +284,7 @@ plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Ethnicity, 
     axis.title.y = element_blank()
   ) +
   labs(
-    title = "Probability of OPSCC given no HPV for married insured people by ethnicity",
+    title = "1B: Probability of OPSCC given no HPV for married insured people by ethnicity",
     subtitle = "(with 95% credible interval)"
   )
 # plot4 <- grid.arrange(plot4a, plot4b,
@@ -291,7 +292,7 @@ plot4b <- ggplot(p4, aes(x = age, y = p_HNC_no_HPV * 10000, colour = Ethnicity, 
 #   bottom = "Age",
 #   left = "Cases per ten thousand"
 # )
-plot4 <-  ggarrange(plot4a, plot4b, ncol=1, nrow=2, common.legend = TRUE, legend = 'right')
+plot4 <-  ggarrange(plot4a, plot4b, ncol=1, nrow=2, common.legend = TRUE, legend = 'bottom')
 plot4 <- annotate_figure(plot4, left = textGrob("Cases per ten thousand", rot = 90, vjust = 1),
                          bottom = textGrob("Age"))
 ggsave(plot4, file = "output/p_HNC_by_ethnicity_20210705.pdf", width = 10, height = 5)
